@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Seedless" width="100%">
+  <img src="assets/banner-2026-09.png" alt="Seedless" width="100%">
 </p>
 
 # Seedless Labs
