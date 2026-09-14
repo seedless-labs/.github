@@ -21,8 +21,8 @@ This page is the technical reference for how Seedless works. For the product its
 ## What Seedless does
 
 ### Pay a bank account
-- **Wallet to Nigerian bank.** Pick a bank, enter an account number, and the account holder's name is returned *before* you confirm. The amount is entered in naira. The app sends the exact USDC the order requires, and a licensed local partner settles the naira.
-- **Pay from whatever you hold.** If the wallet is short of USDC for a payout, Seedless sells just enough of another holding to cover it and shows which asset it used. A wallet that already holds enough USDC never touches this path.
+- **Straight to a Nigerian bank.** Pick a bank, enter an account number, and the account holder's name is returned *before* you confirm. The amount is entered in naira. The app sends the exact USDC the order requires, and a licensed local partner settles the naira.
+- **Pay from whatever you hold.** If the account is short of USDC for a payout, Seedless sells just enough of another holding to cover it and shows which asset it used. An account that already holds enough USDC never touches this path.
 - **Region-aware.** Bank payouts are live in Nigeria. Everywhere else, the payout screen explains that it isn't available there yet, before anyone fills in bank details.
 
 ### Hold and grow
@@ -52,7 +52,7 @@ This page is the technical reference for how Seedless works. For the product its
 ```mermaid
 flowchart LR
   subgraph Phone["Seedless app (React Native)"]
-    UI[Screens] --> Core[Wallet core]
+    UI[Screens] --> Core[Account core]
     Core --> PK[Passkey + session keys]
     Core --> DK[Device key, ed25519]
   end
@@ -94,7 +94,7 @@ One rate, charged on what the user asked for, never on the steps taken to delive
 |---|---|
 | Pay a Nigerian bank account | 0.5% |
 | Swap one token for another | 0.5% |
-| Hold, receive, send to a wallet | Free |
+| Hold, receive, send to any address | Free |
 | Selling a holding to cover a payout | Free (already covered by the payout fee) |
 | Network fees | Sponsored |
 
@@ -112,7 +112,7 @@ A few problems worth writing down:
 - **Exact payouts from any token.** A bank order needs an exact USDC figure, and Jupiter's exact-output mode has no route for stock pools. A solver seeds from a reverse quote and verifies with exact-input quotes. It works on any Solana token and converges in three to four quotes.
 - **Transaction size.** Swaps use direct routes, so the swap plus the passkey authorization stays under Solana's 1,232-byte limit. Larger payloads use LazorKit's authorize-then-execute flow.
 - **Fee headroom.** A platform fee comes off the swap output, the same headroom slippage uses. Selling to cover a payout carries no fee, so a payment can’t land a cent short.
-- **Sponsored-send limits.** Kora can't enforce spend limits per wallet, so rate limits on sponsored sends live in the app.
+- **Sponsored-send limits.** Kora can't enforce spend limits per account, so rate limits on sponsored sends live in the app.
 
 The app has 342 automated tests.
 
