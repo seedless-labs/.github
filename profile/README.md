@@ -138,7 +138,7 @@ Responsible disclosure: [seedlesslabs.xyz/security](https://seedlesslabs.xyz/sec
 | Hackathon | Result | Prize | Date |
 |---|---|---|---|
 | Bags Hackathon | Winner (#5) | $26,000 | May 2026 |
-| Colosseum Frontier: Umbra side track | 2nd place | 2,997 USDC | May 2026 |
+| Colosseum Frontier: Umbra side track | 2nd place | 3,000 USDC | May 2026 |
 | Colosseum Frontier: Encrypt / Ika side track | Award | 1,000 USDC | June 2026 |
 | Colosseum Frontier: 100xDevs track | 2nd place | 2,000 USDG | July 2026 |
 
