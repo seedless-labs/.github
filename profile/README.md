@@ -4,7 +4,7 @@
 
 # Seedless Labs
 
-**Seedless is a wallet for people who earn in dollars and live in naira.** Hold dollars and stocks, send money to anyone, and pay any Nigerian bank account straight from the wallet. There's no seed phrase, and users never need to hold SOL for network fees.
+**Seedless is a money app for people who get paid in dollars.** Hold dollars and stocks, send money to anyone, and pay any Nigerian bank account straight from the app. It runs on Solana under the hood. There's no seed phrase, and nobody needs to hold SOL for network fees.
 
 This page is the technical reference for how Seedless works. For the product itself, see [seedlesslabs.xyz](https://seedlesslabs.xyz).
 
@@ -21,8 +21,8 @@ This page is the technical reference for how Seedless works. For the product its
 ## What Seedless does
 
 ### Pay a bank account
-- **Wallet to Nigerian bank.** Pick a bank, enter an account number, and the account holder's name is returned *before* you confirm. The amount is entered in naira. The app sends the exact USDC the order requires, and a licensed local partner settles the naira.
-- **Pay from whatever you hold.** If the wallet is short of USDC for a payout, Seedless sells just enough of another holding to cover it and shows which asset it used. A wallet that already holds enough USDC never touches this path.
+- **Straight to a Nigerian bank.** Pick a bank, enter an account number, and the account holder's name is returned *before* you confirm. The amount is entered in naira. The app sends the exact USDC the order requires, and a licensed local partner settles the naira.
+- **Pay from whatever you hold.** If the account is short of USDC for a payout, Seedless sells just enough of another holding to cover it and shows which asset it used. An account that already holds enough USDC never touches this path.
 - **Region-aware.** Bank payouts are live in Nigeria. Everywhere else, the payout screen explains that it isn't available there yet, before anyone fills in bank details.
 
 ### Hold and grow
@@ -30,18 +30,18 @@ This page is the technical reference for how Seedless works. For the product its
 - **Earn.** Put USDC into Jupiter Lend and take it out at any time. The rate is variable. The balance you see comes from the chain, and the live ticker is a projection shown separately.
 
 ### Send
-- **To a wallet**, with a saved address book and Solana Pay payment requests.
+- **To any Solana address**, with a saved address book and Solana Pay payment requests.
 - **Privately**, through Umbra: a private balance and private sends.
-- **To someone with no wallet.** A claim link carries a one-time key in the URL fragment, which browsers never send to a server. The recipient opens it and the money lands. Unclaimed links can be taken back by the sender.
+- **To someone who doesn't have Seedless.** A claim link carries a one-time key in the URL fragment, which browsers never send to a server. The recipient opens it and the money lands. Unclaimed links can be taken back by the sender.
 
 ### Swap
 - Any supported pair through Jupiter, and $SEED through Bags.
 
-### The wallet itself
-- **Passkey smart wallet** (LazorKit). The authority is a P-256 passkey on the device, confirmed with Face ID or fingerprint.
+### The account itself
+- **Passkey account** (LazorKit smart account). The authority is a P-256 passkey on the device, confirmed with Face ID or fingerprint.
 - **Gasless.** Network fees are sponsored through the Kora paymaster.
 - **Session keys.** Short-lived keys authorized for a fixed slot window, so repeated everyday actions don't prompt for biometrics every time.
-- **Multi-wallet**, **burner wallets** (isolated keypairs with no on-chain link to the main wallet), and **stealth addresses**.
+- **Multiple accounts**, **burner addresses** (isolated keypairs with no on-chain link to the main account), and **stealth addresses**.
 - **Curated token list.** Holdings are joined against Jupiter's verified list, so airdropped look-alike tokens don't appear as real balances.
 - Transaction history and an optional biometric lock when the app returns from the background.
 
@@ -52,12 +52,12 @@ This page is the technical reference for how Seedless works. For the product its
 ```mermaid
 flowchart LR
   subgraph Phone["Seedless app (React Native)"]
-    UI[Screens] --> Core[Wallet core]
+    UI[Screens] --> Core[Account core]
     Core --> PK[Passkey + session keys]
     Core --> DK[Device key, ed25519]
   end
 
-  PK -->|sign| LZ[LazorKit smart wallet]
+  PK -->|sign| LZ[LazorKit smart account]
   LZ -->|sponsored fees| KO[Kora paymaster]
   LZ --> SOL[(Solana mainnet)]
 
@@ -73,7 +73,7 @@ flowchart LR
 
 | Layer | Built on |
 |---|---|
-| Wallet and signing | LazorKit passkey smart wallet (P-256), session keys |
+| Accounts and signing | LazorKit passkey smart accounts (P-256), session keys |
 | Fees | Kora paymaster |
 | Swaps and yield | Jupiter swap API, Jupiter Lend |
 | Stocks | xStocks (SPL Token-2022) |
@@ -82,7 +82,7 @@ flowchart LR
 | Backend | Cloudflare Workers + D1 (`seedless-api`) |
 | Payouts | Licensed Nigerian payout partner, called only from the backend |
 
-**How a bank payout moves.** The app never holds a partner credential. It asks `seedless-api` for an order, signed with a device key: a stable ed25519 key, separate from the passkey and from rotating session keys. The API returns a deposit address and an exact USDC amount. The app sends that exact amount on-chain from the user's own wallet, and the partner settles naira to the bank. The payout partner API key lives only in the Worker.
+**How a bank payout moves.** The app never holds a partner credential. It asks `seedless-api` for an order, signed with a device key: a stable ed25519 key, separate from the passkey and from rotating session keys. The API returns a deposit address and an exact USDC amount. The app sends that exact amount on-chain from the user's own account, and the partner settles naira to the bank. The payout partner API key lives only in the Worker.
 
 ---
 
@@ -94,7 +94,7 @@ One rate, charged on what the user asked for, never on the steps taken to delive
 |---|---|
 | Pay a Nigerian bank account | 0.5% |
 | Swap one token for another | 0.5% |
-| Hold, receive, send to a wallet | Free |
+| Hold, receive, send to any address | Free |
 | Selling a holding to cover a payout | Free (already covered by the payout fee) |
 | Network fees | Sponsored |
 
@@ -112,7 +112,7 @@ A few problems worth writing down:
 - **Exact payouts from any token.** A bank order needs an exact USDC figure, and Jupiter's exact-output mode has no route for stock pools. A solver seeds from a reverse quote and verifies with exact-input quotes. It works on any Solana token and converges in three to four quotes.
 - **Transaction size.** Swaps use direct routes, so the swap plus the passkey authorization stays under Solana's 1,232-byte limit. Larger payloads use LazorKit's authorize-then-execute flow.
 - **Fee headroom.** A platform fee comes off the swap output, the same headroom slippage uses. Selling to cover a payout carries no fee, so a payment can’t land a cent short.
-- **Sponsored-send limits.** Kora can't enforce spend limits per wallet, so rate limits on sponsored sends live in the app.
+- **Sponsored-send limits.** Kora can't enforce spend limits per account, so rate limits on sponsored sends live in the app.
 
 The app has 342 automated tests.
 
@@ -120,7 +120,7 @@ The app has 342 automated tests.
 
 ## Security
 
-- Keys never leave the device. The wallet authority is a passkey. Session, burner and device keys live in the platform secure store.
+- Keys never leave the device. The account authority is a passkey. Session, burner and device keys live in the platform secure store.
 - The payout partner's credentials live only in the backend.
 - Payout requests are signed by a device key and verified server-side.
 - Stock mints are pinned, and token lists are curated.
@@ -138,7 +138,7 @@ Responsible disclosure: [seedlesslabs.xyz/security](https://seedlesslabs.xyz/sec
 | Hackathon | Result | Prize | Date |
 |---|---|---|---|
 | Bags Hackathon | Winner (#5) | $26,000 | May 2026 |
-| Colosseum Frontier: Umbra side track | 2nd place | 2,997 USDC | May 2026 |
+| Colosseum Frontier: Umbra side track | 2nd place | 3,000 USDC | May 2026 |
 | Colosseum Frontier: Encrypt / Ika side track | Award | 1,000 USDC | June 2026 |
 | Colosseum Frontier: 100xDevs track | 2nd place | 2,000 USDG | July 2026 |
 
@@ -157,7 +157,7 @@ Every prize was announced publicly by the sponsor and paid on-chain.
 
 ## Repositories
 
-The wallet app and backend are private. Public here:
+The app and backend are private. Public here:
 
 | Repository | What it is |
 |---|---|
