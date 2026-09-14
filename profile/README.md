@@ -4,7 +4,7 @@
 
 # Seedless Labs
 
-**Seedless is a wallet for people who earn in dollars and live in naira.** Hold dollars and stocks, send money to anyone, and pay any Nigerian bank account straight from the wallet. There's no seed phrase, and users never need to hold SOL for network fees.
+**Seedless is a money app for people who get paid in dollars.** Hold dollars and stocks, send money to anyone, and pay any Nigerian bank account straight from the app. It runs on Solana under the hood. There's no seed phrase, and nobody needs to hold SOL for network fees.
 
 This page is the technical reference for how Seedless works. For the product itself, see [seedlesslabs.xyz](https://seedlesslabs.xyz).
 
@@ -30,18 +30,18 @@ This page is the technical reference for how Seedless works. For the product its
 - **Earn.** Put USDC into Jupiter Lend and take it out at any time. The rate is variable. The balance you see comes from the chain, and the live ticker is a projection shown separately.
 
 ### Send
-- **To a wallet**, with a saved address book and Solana Pay payment requests.
+- **To any Solana address**, with a saved address book and Solana Pay payment requests.
 - **Privately**, through Umbra: a private balance and private sends.
-- **To someone with no wallet.** A claim link carries a one-time key in the URL fragment, which browsers never send to a server. The recipient opens it and the money lands. Unclaimed links can be taken back by the sender.
+- **To someone who doesn't have Seedless.** A claim link carries a one-time key in the URL fragment, which browsers never send to a server. The recipient opens it and the money lands. Unclaimed links can be taken back by the sender.
 
 ### Swap
 - Any supported pair through Jupiter, and $SEED through Bags.
 
-### The wallet itself
-- **Passkey smart wallet** (LazorKit). The authority is a P-256 passkey on the device, confirmed with Face ID or fingerprint.
+### The account itself
+- **Passkey account** (LazorKit smart account). The authority is a P-256 passkey on the device, confirmed with Face ID or fingerprint.
 - **Gasless.** Network fees are sponsored through the Kora paymaster.
 - **Session keys.** Short-lived keys authorized for a fixed slot window, so repeated everyday actions don't prompt for biometrics every time.
-- **Multi-wallet**, **burner wallets** (isolated keypairs with no on-chain link to the main wallet), and **stealth addresses**.
+- **Multiple accounts**, **burner addresses** (isolated keypairs with no on-chain link to the main account), and **stealth addresses**.
 - **Curated token list.** Holdings are joined against Jupiter's verified list, so airdropped look-alike tokens don't appear as real balances.
 - Transaction history and an optional biometric lock when the app returns from the background.
 
@@ -57,7 +57,7 @@ flowchart LR
     Core --> DK[Device key, ed25519]
   end
 
-  PK -->|sign| LZ[LazorKit smart wallet]
+  PK -->|sign| LZ[LazorKit smart account]
   LZ -->|sponsored fees| KO[Kora paymaster]
   LZ --> SOL[(Solana mainnet)]
 
@@ -73,7 +73,7 @@ flowchart LR
 
 | Layer | Built on |
 |---|---|
-| Wallet and signing | LazorKit passkey smart wallet (P-256), session keys |
+| Accounts and signing | LazorKit passkey smart accounts (P-256), session keys |
 | Fees | Kora paymaster |
 | Swaps and yield | Jupiter swap API, Jupiter Lend |
 | Stocks | xStocks (SPL Token-2022) |
@@ -82,7 +82,7 @@ flowchart LR
 | Backend | Cloudflare Workers + D1 (`seedless-api`) |
 | Payouts | Licensed Nigerian payout partner, called only from the backend |
 
-**How a bank payout moves.** The app never holds a partner credential. It asks `seedless-api` for an order, signed with a device key: a stable ed25519 key, separate from the passkey and from rotating session keys. The API returns a deposit address and an exact USDC amount. The app sends that exact amount on-chain from the user's own wallet, and the partner settles naira to the bank. The payout partner API key lives only in the Worker.
+**How a bank payout moves.** The app never holds a partner credential. It asks `seedless-api` for an order, signed with a device key: a stable ed25519 key, separate from the passkey and from rotating session keys. The API returns a deposit address and an exact USDC amount. The app sends that exact amount on-chain from the user's own account, and the partner settles naira to the bank. The payout partner API key lives only in the Worker.
 
 ---
 
@@ -120,7 +120,7 @@ The app has 342 automated tests.
 
 ## Security
 
-- Keys never leave the device. The wallet authority is a passkey. Session, burner and device keys live in the platform secure store.
+- Keys never leave the device. The account authority is a passkey. Session, burner and device keys live in the platform secure store.
 - The payout partner's credentials live only in the backend.
 - Payout requests are signed by a device key and verified server-side.
 - Stock mints are pinned, and token lists are curated.
@@ -157,7 +157,7 @@ Every prize was announced publicly by the sponsor and paid on-chain.
 
 ## Repositories
 
-The wallet app and backend are private. Public here:
+The app and backend are private. Public here:
 
 | Repository | What it is |
 |---|---|
