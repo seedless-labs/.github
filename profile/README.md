@@ -168,5 +168,5 @@ the app and backend are private. public here:
 
 <p>
   <img src="assets/logo.png" alt="seedless logo" width="40" align="left">
-  <a href="https://seedlesslabs.xyz">seedlesslabs.xyz</a> · <a href="https://x.com/seedlesslabs">@seedless_wallet</a> · founder <a href="https://x.com/francis_codex">@francis_codex</a> · community <a href="https://t.me/seedless_users">t.me/seedless_users</a>
+  <a href="https://seedlesslabs.xyz">seedlesslabs.xyz</a> · <a href="https://x.com/seedlesslabs">@seedlesslabs</a> · founder <a href="https://x.com/francis_codex">@francis_codex</a> · community <a href="https://t.me/seedless_users">t.me/seedless_users</a>
 </p>
